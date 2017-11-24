@@ -1,23 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cam_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="fr.ece.athouary.geoindoorphone.MainActivity">
+    tools:context="fr.ece.athouary.geoindoorphone.MainActivity"
+    android:orientation="vertical"
+    android:id="@+id/cam_layout">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/phone_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:inputType="phone"
+            android:hint="@string/phone_hint" />
+        <Button
+            android:id="@+id/button_find"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/button_find" />
+
+
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/txt_output"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loading"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-
-
-</android.support.constraint.ConstraintLayout>
+        android:id="@+id/pop_up"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="90sp"
+        android:textStyle="bold" />
+</LinearLayout>

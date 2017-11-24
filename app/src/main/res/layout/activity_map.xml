@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="fr.ece.athouary.geoindoorphone.MapActivity"
+    android:orientation="vertical">
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="456dp"
+        mapbox:mapbox_cameraTargetLat="40.73581"
+        mapbox:mapbox_cameraTargetLng="-73.99155"
+        mapbox:mapbox_cameraZoom="11"
+        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/light-v9"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
+
+    </com.mapbox.mapboxsdk.maps.MapView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <Button
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/back_button" />
+
+        <TextView
+            android:id="@+id/location_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:text="@string/default_location" />
+
+    </LinearLayout>
+
+</LinearLayout>
