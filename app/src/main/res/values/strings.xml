@@ -3,11 +3,9 @@
     <string name="textDefault">Loading</string>
     <string name="mapboxToken">pk.eyJ1Ijoicm9tYWluYmF0IiwiYSI6ImNqYTljcjIzaTBjaWsycXA4d3ltaGxsMHkifQ.5RpB3M9FUwiPHp9pKENi_Q</string>
     <string name="default_location">No location found</string>
-    <string name="back_button">Retour</string>
-    <string name="button_find">Retour</string>
+    <string name="back_button">Back</string>
+    <string name="button_find">Locate my phone</string>
     <string name="here_message">I am here !</string>
     <string name="phone_hint">Phone number</string>
     <string name="loading_message">Loading</string>
-    <string name="location_request_message">GIB_LOCATEPHONE</string>
-    <string name="location_message">GIB_LOCATION</string>
 </resources>

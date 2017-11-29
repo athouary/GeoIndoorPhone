@@ -32,14 +32,4 @@
 
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/pop_up"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="90sp"
-        android:textStyle="bold" />
 </LinearLayout>

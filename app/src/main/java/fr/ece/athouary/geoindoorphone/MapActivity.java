@@ -24,6 +24,8 @@ public class MapActivity extends AppCompatActivity {
     private Button backButton;
     private MapView mapView;
 
+    private String location;
+
     private MapboxMap mapboxMap;
     private boolean mapBoxReady = false;
 
@@ -33,10 +35,16 @@ public class MapActivity extends AppCompatActivity {
         Mapbox.getInstance(this, this.getResources().getString(R.string.mapboxToken));
         setContentView(R.layout.activity_map);
 
+
         locationText = (TextView) findViewById(R.id.location_view);
         backButton = (Button) findViewById(R.id.back_button);
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
+
+        //récupération et affichage des coordonnées dans l'intent
+        Intent intentCoord = getIntent();
+        location = intentCoord.getStringExtra(MessageReceiver.EXTRA_MESSAGE);
+        locationText.setText(location);
 
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

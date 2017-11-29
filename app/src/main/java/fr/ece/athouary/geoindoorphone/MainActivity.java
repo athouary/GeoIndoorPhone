@@ -1,9 +1,11 @@
 package fr.ece.athouary.geoindoorphone;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,28 +24,23 @@ import com.lize.oledcomm.camera_lifisdk_android.V1.LiFiCamera;
 import java.util.HashMap;
 
 import android.os.Vibrator;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String EXTRA_MESSAGE = "fr.ece.athouary.geoindoorphone.MESSAGE";
+
     // Views declaration
-    private TextView popUp;
     private EditText phoneNum;
     private Button findButton;
 
-    // Managers declaration
-    private LiFiSdkManager liFiSdkManager;
-
-    // Other attributes declaration
-    private HashMap<String, String> lampLocations;
-    private static final int PERMISSIONS_REQUEST_CAMERA = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("Help", "OnCreateBegin");
+
+        Log.v("debugMap", "MainActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // Views initialization
-        popUp = (TextView) findViewById(R.id.pop_up);
         phoneNum = (EditText) findViewById(R.id.phone_num);
         findButton = (Button) findViewById(R.id.button_find);
 
@@ -51,76 +48,63 @@ public class MainActivity extends AppCompatActivity {
         findButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String number = phoneNum.getText().toString();
-
-                if (sendLocationRequestMessage(number)) {
-                    Intent goToNextActivity = new Intent(getApplicationContext(), LoadingActivity.class);
-                    startActivity(goToNextActivity);
-                    finish();
-                }
-
+                goToLoading(number);
             }
         });
-
-        // MessageReceiver instantiation
-
 
         // Permission management
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("Help", "Requesting permission");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_CAMERA);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
-
-        // Lifi Management
-        liFiSdkManager = new LiFiSdkManager(this, LiFiSdkManager.CAMERA_LIB_VERSION_0_1, "token", "user", new ILiFiPosition() {
-            @Override
-            public void onLiFiPositionUpdate(String lamp) {
-                // lamp will contain the tag (eg. 10101010) if decoding was successful.
-                // If there was an error, lamp could contain the text "No lamp detected" or "Weak signal".
-                Log.d("Help", "PositionUpdateBegin");
-                String location = lampLocations.get(lamp);
-                Log.d("Help", "PositionUpdateFinish");
-                // TODO: send location
-            }
-        });
-        liFiSdkManager.setLocationRequestMode(LiFiSdkManager.LOCATION_REQUEST_OFFLINE_MODE);
-        liFiSdkManager.init(R.id.cam_layout, LiFiCamera.BACK_CAMERA);
-        liFiSdkManager.start();
-
-        // Other initializations
-        lampLocations = new HashMap<>();
-        lampLocations.put("11000011", "51.43393,7.97437");
-        lampLocations.put("00111100", "51.43455,7.97437");
-        lampLocations.put("10101010", "51.49577,7.97437");
-
-        Log.d("Help", "OnCreateFinish");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, 1);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, 1);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_SMS}, 1);
+        }
     }
 
-    @Override
-    protected void onDestroy() {
-        Log.d("Help", "onDestroy");
-        super.onDestroy();
+    protected void makeToast(String txt, int length) {
+        Toast.makeText(this, txt, length).show();
+    }
 
-        // Free Managers
-        if (liFiSdkManager != null && liFiSdkManager.isStarted()) {
-            liFiSdkManager.stop();
-            liFiSdkManager.release();
-            liFiSdkManager = null;
+    protected void goToLoading(String numberToSend) {
+        Log.v("debug", "goToLoading start");
+        if (sendLocationRequestMessage(numberToSend)) {
+            Log.v("debug", "ok");
+            Intent intent = new Intent(this, LoadingActivity.class);
+            intent.putExtra(EXTRA_MESSAGE, numberToSend);
+            startActivity(intent);
+        }
+        else {
+            makeToast("Couldn't load", Toast.LENGTH_LONG);
         }
     }
 
     protected boolean sendLocationRequestMessage(String number) {
         if(!number.equals("")){
-            SmsManager sms = SmsManager.getDefault();
-            sms.sendTextMessage(number, null, getString(R.string.location_message), null, null);
+            sendSMS(number, MessageReceiver.LOCATION_REQUEST_MESSAGE);
             return true;
         }
-        else
-            return false;
+        else {
+            return true;
+        }
     }
 
-    public void showPresence() {
-        popUp.setText(getString(R.string.here_message));
-        Vibrator vibrator = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
-        vibrator.vibrate(500);
+    private void sendSMS(String number, String message) {
+        SmsManager sms = SmsManager.getDefault();
+        PendingIntent sentPI;
+        String SENT = "SMS_SENT";
+        sentPI = PendingIntent.getBroadcast(this, 0,new Intent(SENT), 0);
+        try{
+            sms.sendTextMessage(number, null, message, sentPI, null);
+        }
+        catch(Exception e)
+        {
+            Log.v("debug", e.toString());
+        }
     }
 }
