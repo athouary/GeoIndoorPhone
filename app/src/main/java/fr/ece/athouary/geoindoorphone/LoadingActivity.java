@@ -11,7 +11,6 @@ public class LoadingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.v("debugMap", "LoadingActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
 
@@ -22,7 +21,5 @@ public class LoadingActivity extends AppCompatActivity {
         // Capture the layout's TextView and set the string as its text
         TextView textView = (TextView)findViewById(R.id.pop_up);
         textView.setText(textView.getText() + "\n" + message);
-
-        Log.v("debug", "onCreate LoadingAcvtivity end");
     }
 }

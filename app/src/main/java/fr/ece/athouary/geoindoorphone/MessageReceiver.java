@@ -6,42 +6,63 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 
+import android.os.Bundle;
+import android.telephony.SmsMessage;
 import android.util.Log;
+import android.widget.Toast;
 
 /* Classe permettant de gérer la reception d'un SMS*/
 public class MessageReceiver extends BroadcastReceiver {
 
     public static final String LOCATION_REQUEST_MESSAGE = "GIB_LOCATEPHONE";
     public static final String LOCATION_MESSAGE = "GIB_LOCATION";
-    public static final String EXTRA_MESSAGE = "fr.ece.athouary.geoindoorphone.MESSAGE";
+    public static final String EXTRA_REQUEST_NUMERO = "tel_info";
+    public static final String EXTRA_MAP_MESSAGE = "location_info";
 
     private static final String TAG = MessageReceiver.class.getSimpleName();
+
+    public static final String SMS_BUNDLE = "pdus";
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.v("debugMap", "MessageReceived");
+        Bundle intentExtras = intent.getExtras();
+        if (intentExtras != null) {
+            Object[] sms = (Object[]) intentExtras.get(SMS_BUNDLE);
+            String smsMessageStr = "";
 
-        Cursor c = context.getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
-        c.moveToFirst();
-        //On récupère le corps du message
-        String smsBody = c.getString(12);
-        //On récupère le numéro de l'expéditeur
-        String num = c.getString(2);
+            SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) sms[0]);
 
-        Log.v("debugMap", smsBody);
+            String smsBody = smsMessage.getMessageBody().toString();
+            String numero = smsMessage.getOriginatingAddress();
 
-        if (smsBody.equals(LOCATION_REQUEST_MESSAGE)) {
-            Intent lostIntent = new Intent(context, LostActivity.class);
-            lostIntent.putExtra(EXTRA_MESSAGE, num);
-            context.startActivity(lostIntent);
-        } else if (smsBody.contains(LOCATION_MESSAGE)) {
-            String location = smsBody;
-            location.replace(LOCATION_MESSAGE +"\n", "");
-            Intent mapIntent = new Intent(context, MapActivity.class);
-            mapIntent.putExtra(EXTRA_MESSAGE, location);
-            Log.v("debugMap", location);
-            context.startActivity(mapIntent);
+            if (smsBody.contains(LOCATION_REQUEST_MESSAGE)) {
+                String[] splitedSms = smsBody.split(";");
+                String mode = splitedSms[1];
+                String textToPrint = splitedSms[2];
+                boolean vibrator = Boolean.parseBoolean(splitedSms[3]);
+                boolean flash = Boolean.parseBoolean(splitedSms[4]);
+
+                Intent lostIntent = new Intent(context, LostActivity.class);
+                lostIntent.putExtra(EXTRA_REQUEST_NUMERO, numero);
+                lostIntent.putExtra(MainActivity.EXTRA_TEXT, textToPrint);
+                lostIntent.putExtra(MainActivity.EXTRA_MODE, mode);
+                lostIntent.putExtra(MainActivity.EXTRA_VIBRATOR, vibrator);
+                lostIntent.putExtra(MainActivity.EXTRA_FLASH, flash);
+                context.startActivity(lostIntent);
+            }
+            else if (smsBody.contains(LOCATION_MESSAGE)) {
+                Log.v("DebugToggle", "test1");
+                String location = smsBody;
+                location = location.replace(LOCATION_MESSAGE+"\n", "");
+                Log.v("DebugToggle", "test2");
+                //location.substring(LOCATION_MESSAGE.length()+2);
+                Intent mapIntent = new Intent(context, MapActivity.class);
+                Log.v("DebugToggle", "test3|" +location);
+                mapIntent.putExtra(EXTRA_MAP_MESSAGE, location);
+                Log.v("DebugToggle", "test4");
+                context.startActivity(mapIntent);
+            }
         }
     }
 

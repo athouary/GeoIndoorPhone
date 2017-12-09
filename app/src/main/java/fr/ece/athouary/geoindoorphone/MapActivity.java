@@ -24,10 +24,12 @@ public class MapActivity extends AppCompatActivity {
     private Button backButton;
     private MapView mapView;
 
+    private Double Lat = 0.0;
+    private Double Lng = 0.0;
+
     private String location;
 
     private MapboxMap mapboxMap;
-    private boolean mapBoxReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class MapActivity extends AppCompatActivity {
         Mapbox.getInstance(this, this.getResources().getString(R.string.mapboxToken));
         setContentView(R.layout.activity_map);
 
+        Log.v("DebugToggle", "start Map Activity");
 
         locationText = (TextView) findViewById(R.id.location_view);
         backButton = (Button) findViewById(R.id.back_button);
@@ -43,7 +46,7 @@ public class MapActivity extends AppCompatActivity {
 
         //récupération et affichage des coordonnées dans l'intent
         Intent intentCoord = getIntent();
-        location = intentCoord.getStringExtra(MessageReceiver.EXTRA_MESSAGE);
+        location = intentCoord.getStringExtra(MessageReceiver.EXTRA_MAP_MESSAGE);
         locationText.setText(location);
 
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -54,40 +57,39 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
-        Bundle b = getIntent().getExtras();
+        /*Bundle b = getIntent().getExtras();
         String location = ""; // or other values
         if(b != null)
-            location = b.getString("phoneNum");
+            location = b.getString("phoneNum");*/
 
         if (location != null){
-            locationText.setText("Location: " + location);
             Log.d("Help","StartParsing");
-            Double Lat = Double.parseDouble(location.split(",")[0]);
-            Double Lng = Double.parseDouble(location.split(",")[1]);
-            Log.d("Help","EndParsing");
-
-            Icon icon = IconFactory.getInstance(MapActivity.this).fromResource(R.drawable.marker);
-            LatLng latLng = new LatLng(Lat, Lng);
-            if (mapBoxReady) {
-                // marker view using all the different options available
-                mapboxMap.addMarker(new MarkerViewOptions()
-                        .position(latLng)
-                        .icon(icon));
-                mapboxMap.setCameraPosition(new CameraPosition.Builder()
-                        .target(latLng)
-                        .zoom(13.0)
-                        .build());
-            }
+            Lat = Double.parseDouble(location.split(",")[0]);
+            Lng = Double.parseDouble(location.split(",")[1]);
+            Log.d("Help_parsing","EndParsing : " + Lat + "|" + Lng);
         }
 
         // Managers initialization
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mbMap) {
-                Log.d("Help","MapReadyBegin");
-                mapboxMap = mbMap;
-                mapBoxReady = true;
-                Log.d("Help","MapReadyFinish");
+                Log.d("Help_parsing","start displaying");
+
+                Icon icon = IconFactory.getInstance(MapActivity.this).fromResource(R.drawable.marker);
+                Log.d("Help_parsing","stop1");
+                LatLng latLng = new LatLng(Lat, Lng);
+                Log.d("Help_parsing","stop2");
+
+                // marker view using all the different options available
+                mbMap.addMarker(new MarkerViewOptions()
+                        .position(latLng)
+                        .icon(icon));
+                Log.d("Help_parsing","stop3");
+                mbMap.setCameraPosition(new CameraPosition.Builder()
+                        .target(latLng)
+                        .zoom(13.0)
+                        .build());
+                Log.d("Help_parsing","end displaying");
             }
         });
 
